@@ -2,14 +2,45 @@ import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal } from 'react-native';
 import Task from './components/Task';
 import { TASKS } from './shared/tasks';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 import { AntDesign } from '@expo/vector-icons';
+//async
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SplashScreen from 'expo-splash-screen';
 
+
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
 
-  const [tasks, setTasks] = useState(TASKS);
+  const [ready, setReady] = useState(false);
+
+  const [tasks, setTasks] = useState([]);
+
+  //initial load
+  useEffect(() => {
+    async function prepare() {
+      try {
+        LoadTasks()
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setReady(true);
+      }
+    }
+    prepare();
+  }, []);
+
+  const LoadTasks = () => {
+    AsyncStorage.getItem('storedTasks').then(data => {
+      if (data !== null) {
+        setTasks(JSON.parse(data))
+      }
+    }).catch((error) => console.log(error));
+  }
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -17,7 +48,6 @@ export default function App() {
 
   const handleOpenModal = () => {
     setModalVisible(true);
-
   }
 
 
@@ -32,9 +62,10 @@ export default function App() {
       timeNum: 7
     };
     const newTasks = [...tasks, newTask];
-    setTasks(newTasks);
-    handleCloseModal();
-
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+      handleCloseModal();
+    }).catch(error => console.log(error));
   }
 
   const RenderTask = ({ item: task }) => {
@@ -46,106 +77,86 @@ export default function App() {
     )
   }
 
-  if (tasks.length === 0) {
-    return (
-      <View >
-        <Text style={styles.titleText}>When did I...?</Text>
-        <Pressable onPress={() => { setModalVisible(true) }}
-        >
-          <AntDesign name="plus" size={30} color={'#777'} />
-        </Pressable>
+  ///spalsh load
+  const onLayoutRootView = useCallback(async () => {
+    if (ready) {
+      await SplashScreen.hideAsync();
+    }
+  }, [ready]);
+
+  if (!ready) {
+    return null;
+  }
+
+  return (
+    <View
+      onLayout={onLayoutRootView}
+      style={styles.container}>
+      <Text style={styles.titleText}>When did I...?</Text>
+      <FlatList style={{ width: '100%' }}
+        data={tasks}
+        renderItem={RenderTask}
+        keyExtractor={(item) => item.id}
+      >
+      </FlatList>
+      <View>
         <Modal
           animationType='slide'
           visible={modalVisible}
           onRequestClose={handleCloseModal}
+          transparent={true}
         >
-          <View
-            style={{
-              flexDirection: 'row'
-            }}
-          >
-            <AntDesign name='edit' size={30} color={'#555'} />
-            <TextInput
-              placeholder='placehold'
-              onChangeText={(text) => setTaskInputValue(text)}
-              value={taskInputValue}
-              onSubmitEditing={handleSubmit}
-            />
-            <Pressable onPress={() => { handleCloseModal }}
-            >
-              <AntDesign name="close" size={30} color={'#777'} />
-            </Pressable>
+          <View style={styles.modalView} >
+            <View>
+              <Text
+                style={styles.modalTitle}
+              >
+                Add a New Task
+              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder='hello'
+                onChangeText={(text) => setTaskInputValue(text)}
+                value={taskInputValue}
+                onSubmitEditing={handleSubmit}
+                maxLength={40}
+                textAlign='center'
+                multiline={true}
+              />
+            </View>
+            <View style={styles.modalButtonRow} >
+              <Pressable
+                style={styles.modalButtonNo}
+                onPress={() => { handleCloseModal() }}
+              >
+                <AntDesign name="close" size={30} color={'white'} />
+              </Pressable>
+              <Pressable
+                style={styles.modalButtonYes}
+                onPress={() => { handleSubmit() }}
+              >
+                <AntDesign name="check" size={30} color={'white'} />
+              </Pressable>
+            </View>
           </View>
 
         </Modal>
-        <StatusBar style="auto" />
       </View>
-    );
-  } else {
-    return (
-
-      <View style={styles.container}>
-        <Text style={styles.titleText}>When did I...?</Text>
-        <FlatList style={{ width: '100%' }}
-          data={tasks}
-          renderItem={RenderTask}
-          keyExtractor={(item) => item.id}
-        >
-        </FlatList>
-        <View>
-          <Modal
-            animationType='slide'
-            visible={modalVisible}
-            onRequestClose={handleCloseModal}
-            transparent={true}
-          >
-            <View style={styles.modalView} >
-              <View>
-                <Text
-                  style={styles.modalTitle}
-                >
-                  Add a New Task
-                </Text>
-                <TextInput
-                  style={styles.textInput}
-                  placeholder='hello'
-                  onChangeText={(text) => setTaskInputValue(text)}
-                  value={taskInputValue}
-                  onSubmitEditing={handleSubmit}
-                  maxLength={40}
-                  textAlign='center'
-                  multiline={true}
-                />
-              </View>
-              <View style={styles.modalButtonRow} >
-                <Pressable
-                  style={styles.modalButtonNo}
-                  onPress={() => { handleCloseModal() }}
-                >
-                  <AntDesign name="close" size={30} color={'white'} />
-                </Pressable>
-                <Pressable
-                  style={styles.modalButtonYes}
-                  onPress={() => { handleSubmit() }}
-                >
-                  <AntDesign name="check" size={30} color={'white'} />
-                </Pressable>
-              </View>
-            </View>
-
-          </Modal>
-        </View>
-        <Pressable onPress={() => { handleOpenModal() }}
-        >
+      <Pressable onPress={() => { handleOpenModal() }}
+      >
+        <View
+          style={{ alignItems: 'center' }}>
           <AntDesign name="plus" size={30} color={'#777'} />
-          <Text>press</Text>
-        </Pressable>
-        <StatusBar style="auto" />
-      </View>
+          <Text>Add a New Task</Text>
+        </View>
 
-    );
-  }
+      </Pressable>
+      <StatusBar style="auto" />
+    </View>
+
+  );
 }
+
 
 const styles = StyleSheet.create({
   container: {
