@@ -4,7 +4,7 @@ import Task from './components/Task';
 import { TASKS } from './shared/tasks';
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 //async
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
@@ -56,10 +56,13 @@ export default function App() {
   }
 
   const handleSubmit = () => {
+    const daysAgo = 2;
+    const today = new Date();
+    const pastWhenDate = today - (daysAgo * 86400000);
     const newTask = {
       id: tasks.length,
       text: taskInputValue,
-      timeNum: 7
+      whenDid: pastWhenDate
     };
     const newTasks = [...tasks, newTask];
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
@@ -68,10 +71,22 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
+  const handleResetTasks = () => {
+    const newTasks = [];
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+    }).catch(error => console.log(error));
+  }
+
   const RenderTask = ({ item: task }) => {
+    //compute timenum as days since whendate
+    const todayDate = new Date();
+    const whenDate = task.whenDid
+    //86,400,000 is ms in a day
+    const timeNum = Math.round(Math.abs(todayDate - whenDate) / 86400000);
     return (
       <View>
-        <Task text={task.text} timeNum={task.timeNum} />
+        <Task text={task.text} timeNum={timeNum} />
       </View>
 
     )
@@ -142,15 +157,27 @@ export default function App() {
 
         </Modal>
       </View>
-      <Pressable onPress={() => { handleOpenModal() }}
+      <View
+        style={{ alignItems: 'center', marginTop: 10, flexDirection: 'row' }}
       >
-        <View
-          style={{ alignItems: 'center' }}>
-          <AntDesign name="plus" size={30} color={'#777'} />
-          <Text>Add a New Task</Text>
-        </View>
+        <Pressable onPress={() => { handleOpenModal() }}
+        >
+          <View
+            style={{ alignItems: 'center', marginHorizontal: 20 }}>
+            <AntDesign name="plus" size={30} color={'#777'} />
+            <Text>Add a New Task</Text>
+          </View>
+        </Pressable>
+        <Pressable onPress={() => { handleResetTasks() }}
+        >
+          <View
+            style={{ alignItems: 'center', marginHorizontal: 20 }}>
+            <FontAwesome name="trash" size={30} color={'#777'} />
+            <Text>Clear All Tasks</Text>
+          </View>
+        </Pressable>
+      </View>
 
-      </Pressable>
       <StatusBar style="auto" />
     </View>
 
