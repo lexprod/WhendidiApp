@@ -56,10 +56,13 @@ export default function App() {
   }
 
   const handleSubmit = () => {
+    const daysAgo = 2;
+    const today = new Date();
+    const pastWhenDate = today - (daysAgo * 86400000);
     const newTask = {
       id: tasks.length,
       text: taskInputValue,
-      timeNum: 7
+      whenDid: pastWhenDate
     };
     const newTasks = [...tasks, newTask];
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
@@ -68,10 +71,22 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
+  const handleResetTasks = () => {
+    const newTasks = [];
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+    }).catch(error => console.log(error));
+  }
+
   const RenderTask = ({ item: task }) => {
+    //compute timenum as days since whendate
+    const todayDate = new Date();
+    const whenDate = task.whenDid
+    //86,400,000 is ms in a day
+    const timeNum = Math.round(Math.abs(todayDate - whenDate) / 86400000);
     return (
       <View>
-        <Task text={task.text} timeNum={task.timeNum} />
+        <Task text={task.text} timeNum={timeNum} />
       </View>
 
     )
@@ -142,6 +157,7 @@ export default function App() {
 
         </Modal>
       </View>
+      <View></View>
       <Pressable onPress={() => { handleOpenModal() }}
       >
         <View
