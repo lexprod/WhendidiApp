@@ -4,7 +4,7 @@ import Task from './components/Task';
 import { TASKS } from './shared/tasks';
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 //async
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
@@ -157,16 +157,27 @@ export default function App() {
 
         </Modal>
       </View>
-      <View></View>
-      <Pressable onPress={() => { handleOpenModal() }}
+      <View
+        style={{ alignItems: 'center', marginTop: 10, flexDirection: 'row' }}
       >
-        <View
-          style={{ alignItems: 'center' }}>
-          <AntDesign name="plus" size={30} color={'#777'} />
-          <Text>Add a New Task</Text>
-        </View>
+        <Pressable onPress={() => { handleOpenModal() }}
+        >
+          <View
+            style={{ alignItems: 'center', marginHorizontal: 20 }}>
+            <AntDesign name="plus" size={30} color={'#777'} />
+            <Text>Add a New Task</Text>
+          </View>
+        </Pressable>
+        <Pressable onPress={() => { handleResetTasks() }}
+        >
+          <View
+            style={{ alignItems: 'center', marginHorizontal: 20 }}>
+            <FontAwesome name="trash" size={30} color={'#777'} />
+            <Text>Clear All Tasks</Text>
+          </View>
+        </Pressable>
+      </View>
 
-      </Pressable>
       <StatusBar style="auto" />
     </View>
 
