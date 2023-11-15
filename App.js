@@ -82,8 +82,10 @@ export default function App() {
   const handleMarkedDone = ({ item: task }) => {
     //remove task to build new one
 
-    const newTasks = tasks
-    newTasks.splice(task.id, 1);
+    const newTasks = [...tasks];
+    const taskIndex = newTasks.findIndex((t) => t.id === task.id);
+
+    newTasks.splice(taskIndex, 1);
 
     //occurs after a long press on a task, set its time to 0
     const today = new Date();
@@ -94,7 +96,8 @@ export default function App() {
       whenDid: didDate
     };
     newTasks.push(newTask);
-    console.log(newTasks);
+
+    // console.log(newTasks);
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
       setTasks(newTasks);
     }).catch(error => console.log(error));
