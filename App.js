@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal } from 'react-native';
+import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, TouchableHighlight } from 'react-native';
 import Task from './components/Task';
 import { TASKS } from './shared/tasks';
 import { useState, useEffect, useCallback } from 'react';
@@ -8,6 +8,7 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons';
 //async
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
+import { v4 as uuidv4 } from 'uuid';
 
 
 
@@ -60,7 +61,7 @@ export default function App() {
     const today = new Date();
     const pastWhenDate = today - (daysAgo * 86400000);
     const newTask = {
-      id: tasks.length,
+      id: uuidv4(),
       text: taskInputValue,
       whenDid: pastWhenDate
     };
@@ -78,6 +79,31 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
+  const handleMarkedDone = ({ item: task }) => {
+    //remove task to build new one
+
+    const newTasks = [...tasks];
+    const taskIndex = newTasks.findIndex((t) => t.id === task.id);
+
+    newTasks.splice(taskIndex, 1);
+
+    //occurs after a long press on a task, set its time to 0
+    const today = new Date();
+    const didDate = today - 0;
+    const newTask = {
+      id: uuidv4(),
+      text: task.text,
+      whenDid: didDate
+    };
+    newTasks.push(newTask);
+
+    // console.log(newTasks);
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+    }).catch(error => console.log(error));
+
+  }
+
   const RenderTask = ({ item: task }) => {
     //compute timenum as days since whendate
     const todayDate = new Date();
@@ -86,7 +112,9 @@ export default function App() {
     const timeNum = Math.round(Math.abs(todayDate - whenDate) / 86400000);
     return (
       <View>
-        <Task text={task.text} timeNum={timeNum} />
+        <TouchableHighlight onLongPress={() => { handleMarkedDone({ item: task }) }}>
+          <Task text={task.text} timeNum={timeNum} />
+        </TouchableHighlight>
       </View>
 
     )
@@ -111,7 +139,7 @@ export default function App() {
       <FlatList style={{ width: '100%' }}
         data={tasks}
         renderItem={RenderTask}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
       >
       </FlatList>
       <View>
