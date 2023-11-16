@@ -116,7 +116,11 @@ export default function App() {
     const timeNum = Math.round(Math.abs(todayDate - whenDate) / 86400000);
     return (
       <View>
-        <TouchableHighlight onLongPress={() => { handleMarkedDone({ item: task }) }}>
+        <TouchableHighlight
+          //these values will have to change, trying to get the highligh to hide!
+          activeOpacity={0}
+          underlayColor={'#FFF'}
+          onLongPress={() => { handleMarkedDone({ item: task }) }}>
           <Task text={task.text} timeNum={timeNum} />
         </TouchableHighlight>
       </View>
@@ -221,7 +225,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#81ecec',
+    backgroundColor: '#B3E5FC',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 15,
@@ -230,7 +234,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 48,
     fontWeight: '700',
-    color: '#2d3436',
+    color: '#212121',
   },
   modalView: {
     margin: 20,

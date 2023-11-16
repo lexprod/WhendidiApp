@@ -28,12 +28,12 @@ const styles = StyleSheet.create({
     taskText: {
         fontSize: 24,
         fontWeight: '500',
-        color: '#2d3436',
+        color: '#212121',
         flex: 4,
         marginRight: 10
     },
     timeBox: {
-        backgroundColor: '#a29bfe',
+        backgroundColor: '#B39DDB',
         borderRadius: 10,
         justifyContent: 'space-evenly',
         flex: 1,
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     timeTextNumber: {
         fontSize: 36,
         fontWeight: '900',
-        color: '#2d3436',
+        color: '#212121',
         textAlign: 'center',
         margin: -10
     },
