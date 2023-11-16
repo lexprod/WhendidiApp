@@ -70,6 +70,10 @@ export default function App() {
       setTasks(newTasks);
       handleCloseModal();
     }).catch(error => console.log(error));
+
+    // clear the modal
+    setTaskInputValue('');
+    this.textInput.clear()
   }
 
   const handleResetTasks = () => {
@@ -101,8 +105,8 @@ export default function App() {
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
       setTasks(newTasks);
     }).catch(error => console.log(error));
-
   }
+
 
   const RenderTask = ({ item: task }) => {
     //compute timenum as days since whendate
@@ -165,6 +169,7 @@ export default function App() {
                 maxLength={40}
                 textAlign='center'
                 multiline={true}
+                ref={input => { this.textInput = input }}
               />
             </View>
             <View style={styles.modalButtonRow} >
