@@ -47,6 +47,8 @@ export default function App() {
 
   const [taskInputValue, setTaskInputValue] = useState('');
 
+  const [taskInputDays, setTaskInputDays] = useState(0);
+
   const handleOpenModal = () => {
     setModalVisible(true);
   }
@@ -56,8 +58,14 @@ export default function App() {
     setModalVisible(false);
   }
 
+  const handleChangeDays = (daysNum) => {
+    const newTaskInputDays = taskInputDays + daysNum;
+    setTaskInputDays(newTaskInputDays);
+    //update the visual
+  }
+
   const handleSubmit = () => {
-    const daysAgo = 2;
+    const daysAgo = taskInputDays;
     const today = new Date();
     const pastWhenDate = today - (daysAgo * 86400000);
     const newTask = {
@@ -68,12 +76,15 @@ export default function App() {
     const newTasks = [...tasks, newTask];
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
       setTasks(newTasks);
-      handleCloseModal();
-    }).catch(error => console.log(error));
 
+    }).catch(error => console.log(error));
+    handleCloseModal();
     // clear the modal
     setTaskInputValue('');
-    this.textInput.clear()
+    this.textInput.clear();
+    setTaskInputDays(0);
+
+
   }
 
   const handleResetTasks = () => {
@@ -93,6 +104,7 @@ export default function App() {
 
     //occurs after a long press on a task, set its time to 0
     const today = new Date();
+    //using math on the date object turns it into a int number of milliseconds instead
     const didDate = today - 0;
     const newTask = {
       id: uuidv4(),
@@ -111,9 +123,11 @@ export default function App() {
   const RenderTask = ({ item: task }) => {
     //compute timenum as days since whendate
     const todayDate = new Date();
+    //whendid is the date in miliseconds already
     const whenDate = task.whenDid
     //86,400,000 is ms in a day
-    const timeNum = Math.round(Math.abs(todayDate - whenDate) / 86400000);
+    //use math max to gaurantee a non negative number
+    const timeNum = Math.max(0, Math.round((todayDate - whenDate) / 86400000));
     return (
       <View>
         <TouchableHighlight
@@ -166,7 +180,7 @@ export default function App() {
               </Text>
               <TextInput
                 style={styles.textInput}
-                placeholder='hello'
+                placeholder='garbage'
                 onChangeText={(text) => setTaskInputValue(text)}
                 value={taskInputValue}
                 onSubmitEditing={handleSubmit}
@@ -175,6 +189,28 @@ export default function App() {
                 multiline={true}
                 ref={input => { this.textInput = input }}
               />
+            </View>
+            <View style={styles.modalDaysRow} >
+              <Pressable
+                style={styles.modalButtonMinus}
+                onPress={() => { handleChangeDays(-1) }}
+              >
+                <FontAwesome name="minus" size={20} color={'black'} />
+              </Pressable>
+              <View style={styles.inputTimeBox}>
+                <Text style={styles.daysInput} >
+                  {taskInputDays}
+                </Text>
+                <Text style={styles.daysInputLabel} >
+                  days ago
+                </Text>
+              </View>
+              <Pressable
+                style={styles.modalButtonPlus}
+                onPress={() => { handleChangeDays(1) }}
+              >
+                <FontAwesome name="plus" size={20} color={'black'} />
+              </Pressable>
             </View>
             <View style={styles.modalButtonRow} >
               <Pressable
@@ -259,7 +295,8 @@ const styles = StyleSheet.create({
   },
   modalButtonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
+    marginVertical: 5,
   },
   modalButtonYes: {
     backgroundColor: 'green',
@@ -294,5 +331,41 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 20,
     fontSize: 20,
+  },
+  inputTimeBox: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    marginHorizontal: 20
+  },
+  daysInput: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#212121',
+    textAlign: 'center',
+    marginVertical: -5,
+    marginTop: -10
+  },
+  daysInputLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#2d3436',
+    textAlign: 'center',
+    marginBottom: -3
+  },
+  modalButtonPlus: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonMinus: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalDaysRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 5,
   },
 });
