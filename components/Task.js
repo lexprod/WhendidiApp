@@ -7,8 +7,8 @@ const Task = (props) => {
         <View style={styles.taskContainer}>
             <Text style={styles.taskText}>{props.text}</Text>
             <View style={styles.timeBox}>
-                <Text style={styles.timeTextNumber} >{props.timeNum}</Text>
-                <Text style={styles.timeTextLabel} >days ago</Text>
+                <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
+                <Text style={styles.timeTextLabel}>days ago</Text>
             </View>
         </View>
     );
