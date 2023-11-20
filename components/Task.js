@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet } from 'react-native';
 import React from 'react';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 
 const Task = (props) => {
     return (
         <View style={styles.taskContainer}>
             <Text style={styles.taskText}>{props.text}</Text>
+            <FontAwesome name="trash" size={20} color={'black'} />
             <View style={styles.timeBox}>
                 <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
                 <Text style={styles.timeTextLabel}>days ago</Text>
