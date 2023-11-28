@@ -7,7 +7,14 @@ const Task = (props) => {
     return (
         <View style={styles.taskContainer}>
             <Text style={styles.taskText}>{props.text}</Text>
-            <FontAwesome name="trash" size={20} color={'black'} />
+            {/* //if edit mode on render trash button */}
+            {(props.editMode) ? (
+                <View
+                    style={styles.trashBox}
+                >
+                    <FontAwesome name="trash" size={20} color={'black'} />
+                </View>
+            ) : null}
             <View style={styles.timeBox}>
                 <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
                 <Text style={styles.timeTextLabel}>days ago</Text>
@@ -41,6 +48,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 10,
         paddingHorizontal: 5,
+    },
+    trashBox: {
+        borderRadius: 10,
+        width: 40,
     },
     timeTextNumber: {
         fontSize: 36,

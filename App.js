@@ -20,6 +20,7 @@ export default function App() {
 
   const [tasks, setTasks] = useState([]);
 
+
   //initial load
   useEffect(() => {
     async function prepare() {
@@ -119,6 +120,7 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
+  const [editMode, setEditMode] = useState(false);
 
   const RenderTask = ({ item: task }) => {
     //compute timenum as days since whendate
@@ -135,7 +137,7 @@ export default function App() {
           activeOpacity={0}
           underlayColor={'#FFF'}
           onLongPress={() => { handleMarkedDone({ item: task }) }}>
-          <Task text={task.text} timeNum={timeNum} />
+          <Task text={task.text} timeNum={timeNum} editMode={editMode} />
         </TouchableHighlight>
       </View>
 
@@ -231,24 +233,32 @@ export default function App() {
         </Modal>
       </View>
       <View
-        style={{ alignItems: 'center', marginTop: 10, flexDirection: 'row' }}
+        style={styles.mainButtonRow}
       >
         <Pressable onPress={() => { handleOpenModal() }}
         >
           <View
             style={{ alignItems: 'center', marginHorizontal: 20 }}>
             <AntDesign name="plus" size={30} color={'#777'} />
-            <Text>Add a New Task</Text>
+            <Text style={{ color: '#777' }}>Add a New Task</Text>
           </View>
         </Pressable>
-        <Pressable onPress={() => { handleResetTasks() }}
+        <Pressable onPress={() => { setEditMode(!editMode) }}
+        >
+          <View
+            style={editMode ? styles.editButtonOn : styles.editButtonOff}>
+            <FontAwesome name="edit" size={30} color={editMode ? '#FFF' : '#777'} />
+            <Text style={{ color: (editMode ? '#FFF' : '#777') }} >Edit Tasks</Text>
+          </View>
+        </Pressable>
+        {/* <Pressable onPress={() => { handleResetTasks() }}
         >
           <View
             style={{ alignItems: 'center', marginHorizontal: 20 }}>
             <FontAwesome name="trash" size={30} color={'#777'} />
             <Text>Clear All Tasks</Text>
           </View>
-        </Pressable>
+        </Pressable> */}
       </View>
 
       <StatusBar style="auto" />
@@ -264,8 +274,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#B3E5FC',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 15,
+    paddingHorizontal: 15,
     paddingTop: 50,
+    paddingBottom: 10,
   },
   titleText: {
     fontSize: 48,
@@ -367,5 +378,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 5,
+  },
+  editButtonOn: {
+    alignItems: 'center',
+    backgroundColor: '#fd79a8',
+    borderRadius: 20,
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginTop: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+  },
+  editButtonOff: {
+    alignItems: 'center',
+    borderRadius: 20,
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    marginTop: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+  },
+  mainButtonRow: {
+    alignItems: 'center',
+    marginTop: 1,
+    flexDirection: 'row'
   },
 });
