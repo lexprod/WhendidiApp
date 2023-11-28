@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import React from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
@@ -9,17 +9,19 @@ const Task = (props) => {
             <Text style={styles.taskText}>{props.text}</Text>
             {/* //if edit mode on render trash button */}
             {(props.editMode) ? (
-                <View
+                <Pressable
                     style={styles.trashBox}
+                    onPress={() => props.handleDeleteOne({ item: props.task })}
                 >
-                    <FontAwesome name="trash" size={20} color={'black'} />
-                </View>
-            ) : null}
+                    <FontAwesome name="trash" size={28} color={'red'} />
+                </Pressable>
+            ) : null
+            }
             <View style={styles.timeBox}>
                 <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
                 <Text style={styles.timeTextLabel}>days ago</Text>
             </View>
-        </View>
+        </View >
     );
 };
 

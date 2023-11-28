@@ -51,6 +51,7 @@ export default function App() {
   const [taskInputDays, setTaskInputDays] = useState(0);
 
   const handleOpenModal = () => {
+    setEditMode(false);
     setModalVisible(true);
   }
 
@@ -120,6 +121,18 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
+  const handleDeleteOne = ({ item: task }) => {
+    //remove task to build new one
+
+    const newTasks = [...tasks];
+    const taskIndex = newTasks.findIndex((t) => t.id === task.id);
+    newTasks.splice(taskIndex, 1);
+    // console.log(newTasks);
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+    }).catch(error => console.log(error));
+  }
+
   const [editMode, setEditMode] = useState(false);
 
   const RenderTask = ({ item: task }) => {
@@ -137,7 +150,7 @@ export default function App() {
           activeOpacity={0}
           underlayColor={'#FFF'}
           onLongPress={() => { handleMarkedDone({ item: task }) }}>
-          <Task text={task.text} timeNum={timeNum} editMode={editMode} />
+          <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} task={task} />
         </TouchableHighlight>
       </View>
 
