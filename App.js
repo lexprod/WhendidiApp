@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, TouchableHighlight } from 'react-native';
 import Task from './components/Task';
-import { TASKS } from './shared/tasks';
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
@@ -9,7 +8,6 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import { v4 as uuidv4 } from 'uuid';
-
 
 
 SplashScreen.preventAutoHideAsync();
@@ -49,6 +47,8 @@ export default function App() {
   const [taskInputValue, setTaskInputValue] = useState('');
 
   const [taskInputDays, setTaskInputDays] = useState(0);
+
+
 
   const handleOpenModal = () => {
     setEditMode(false);
@@ -157,6 +157,37 @@ export default function App() {
     )
   }
 
+  //sorts
+  const [sortMethod, setSortMethod] = useState(0);
+  ///0 is alphabetical, 1 is most days overdue, 2 is least days overdue
+  const handleSort = () => {
+
+    const newTasks = [...tasks];
+    setSortMethod((sortMethod + 1) % 2);
+    if (sortMethod == 0) {
+      newTasks.sort((a, b) => a.whenDid - b.whenDid)
+    }
+    if (sortMethod == 1) {
+      newTasks.sort((a, b) => b.whenDid - a.whenDid)
+    }
+    // if (sortMethod == 2) {
+    //   newTasks.sort((a, b) => {
+    //     if (a.text < b.text) {
+    //       return -1;
+    //     }
+    //     if (a.text > b.text) {
+    //       return 1;
+    //     }
+    //     return 0;
+    //   })
+    // }
+    console.log(sortMethod);
+    console.log(newTasks);
+    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+      setTasks(newTasks);
+    }).catch(error => console.log(error));
+  }
+
   ///spalsh load
   const onLayoutRootView = useCallback(async () => {
     if (ready) {
@@ -251,7 +282,7 @@ export default function App() {
         <Pressable onPress={() => { handleOpenModal() }}
         >
           <View
-            style={{ alignItems: 'center', marginHorizontal: 20 }}>
+            style={styles.newButton}>
             <AntDesign name="plus" size={30} color={'#777'} />
             <Text style={{ color: '#777' }}>Add a New Task</Text>
           </View>
@@ -260,18 +291,18 @@ export default function App() {
         >
           <View
             style={editMode ? styles.editButtonOn : styles.editButtonOff}>
-            <FontAwesome name="edit" size={30} color={editMode ? '#FFF' : '#777'} />
+            <FontAwesome style={{ paddingLeft: 5 }} name="edit" size={30} color={editMode ? '#FFF' : '#777'} />
             <Text style={{ color: (editMode ? '#FFF' : '#777') }} >Edit Tasks</Text>
           </View>
         </Pressable>
-        {/* <Pressable onPress={() => { handleResetTasks() }}
+        <Pressable onPress={() => { handleSort() }}
         >
           <View
-            style={{ alignItems: 'center', marginHorizontal: 20 }}>
-            <FontAwesome name="trash" size={30} color={'#777'} />
-            <Text>Clear All Tasks</Text>
+            style={styles.sortButton}>
+            <FontAwesome name="sort" size={30} color={'#777'} />
+            <Text style={{ color: '#777' }}>Sort</Text>
           </View>
-        </Pressable> */}
+        </Pressable>
       </View>
 
       <StatusBar style="auto" />
@@ -399,7 +430,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 5,
     marginTop: 5,
     paddingVertical: 5,
     paddingHorizontal: 15,
@@ -410,7 +441,31 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 5,
+    marginTop: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+  },
+  newButton: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    borderRadius: 20,
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 5,
+    marginTop: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+  },
+  sortButton: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    borderRadius: 20,
+    flexGrow: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 5,
     marginTop: 5,
     paddingVertical: 5,
     paddingHorizontal: 15,
