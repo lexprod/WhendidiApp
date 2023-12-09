@@ -145,13 +145,12 @@ export default function App() {
     const timeNum = Math.max(0, Math.round((todayDate - whenDate) / 86400000));
     return (
       <View>
-        <TouchableHighlight
-          //these values will have to change, trying to get the highligh to hide!
+        <Pressable
           activeOpacity={0}
           underlayColor={'#FFF'}
           onLongPress={() => { handleMarkedDone({ item: task }) }}>
           <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} task={task} />
-        </TouchableHighlight>
+        </Pressable>
       </View>
 
     )
