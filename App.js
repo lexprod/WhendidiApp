@@ -85,8 +85,6 @@ export default function App() {
     setTaskInputValue('');
     this.textInput.clear();
     setTaskInputDays(0);
-
-
   }
 
   const handleResetTasks = () => {
@@ -96,30 +94,6 @@ export default function App() {
     }).catch(error => console.log(error));
   }
 
-  const handleMarkedDone = ({ item: task }) => {
-    //remove task to build new one
-
-    const newTasks = [...tasks];
-    const taskIndex = newTasks.findIndex((t) => t.id === task.id);
-
-    newTasks.splice(taskIndex, 1);
-
-    //occurs after a long press on a task, set its time to 0
-    const today = new Date();
-    //using math on the date object turns it into a int number of milliseconds instead
-    const didDate = today - 0;
-    const newTask = {
-      id: uuidv4(),
-      text: task.text,
-      whenDid: didDate
-    };
-    newTasks.push(newTask);
-
-    // console.log(newTasks);
-    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
-      setTasks(newTasks);
-    }).catch(error => console.log(error));
-  }
 
   const handleDeleteOne = ({ item: task }) => {
     //remove task to build new one
@@ -145,13 +119,7 @@ export default function App() {
     const timeNum = Math.max(0, Math.round((todayDate - whenDate) / 86400000));
     return (
       <View>
-        <TouchableHighlight
-          //these values will have to change, trying to get the highligh to hide!
-          activeOpacity={0}
-          underlayColor={'#FFF'}
-          onLongPress={() => { handleMarkedDone({ item: task }) }}>
-          <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} task={task} />
-        </TouchableHighlight>
+        <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} task={task} handleMarkedDone={handleMarkedDone} />
       </View>
 
     )
@@ -160,33 +128,40 @@ export default function App() {
   //sorts
   const [sortMethod, setSortMethod] = useState(0);
   ///0 is alphabetical, 1 is most days overdue, 2 is least days overdue
-  const handleSort = () => {
-
-    const newTasks = [...tasks];
-    setSortMethod((sortMethod + 1) % 2);
+  const handleSort = (tsks) => {
+    const sortedTasks = [...tsks];
+    console.log(sortMethod);
     if (sortMethod == 0) {
-      newTasks.sort((a, b) => a.whenDid - b.whenDid)
+      sortedTasks.sort((a, b) => a.whenDid - b.whenDid)
     }
     if (sortMethod == 1) {
-      newTasks.sort((a, b) => b.whenDid - a.whenDid)
+      sortedTasks.sort((a, b) => b.whenDid - a.whenDid)
     }
-    // if (sortMethod == 2) {
-    //   newTasks.sort((a, b) => {
-    //     if (a.text < b.text) {
-    //       return -1;
-    //     }
-    //     if (a.text > b.text) {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   })
-    // }
-    console.log(sortMethod);
-    console.log(newTasks);
-    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
-      setTasks(newTasks);
+    console.log(sortedTasks);
+
+    AsyncStorage.setItem('storedTasks', JSON.stringify(sortedTasks)).then(() => {
+      setTasks(sortedTasks);
     }).catch(error => console.log(error));
   }
+
+
+  const handleMarkedDone = ({ item: task }) => {
+    //locate task to mark done
+    const taskIndex = tasks.findIndex((t) => t.id === task.id);
+
+    if (taskIndex !== -1) {
+      const newTasks = [...tasks];
+      const today = new Date();
+      //update whendid to the time right now
+      const didDate = today - 0;
+      newTasks[taskIndex].whenDid = didDate;
+      //sort to move it to bottom
+      newTasks.sort((a, b) => a.whenDid - b.whenDid);
+      setTasks(newTasks);
+      AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).catch(error => console.log(error));
+
+    }
+  };
 
   ///spalsh load
   const onLayoutRootView = useCallback(async () => {
@@ -295,7 +270,17 @@ export default function App() {
             <Text style={{ color: (editMode ? '#FFF' : '#777') }} >Edit Tasks</Text>
           </View>
         </Pressable>
-        <Pressable onPress={() => { handleSort() }}
+        <Pressable onPress={() => {
+          setSortMethod((prevSortMethod) => {
+            const newSortMethod = (prevSortMethod + 1) % 2;
+            setTasks((prevTasks) => {
+              // Ensure that setSortMethod has updated before calling handleSort
+              handleSort(prevTasks, newSortMethod);
+              return prevTasks;
+            });
+            return newSortMethod;
+          });
+        }}
         >
           <View
             style={styles.sortButton}>
