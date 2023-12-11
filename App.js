@@ -272,11 +272,12 @@ export default function App() {
         </Pressable>
         <Pressable onPress={() => {
           setSortMethod((prevSortMethod) => {
-            // prevSortMethod is the previous value of sortMethod
             const newSortMethod = (prevSortMethod + 1) % 2;
-            // call handleSort with the updated sortMethod
-            handleSort(tasks, newSortMethod);
-            // Return the new sortMethod value to update the state
+            setTasks((prevTasks) => {
+              // Ensure that setSortMethod has updated before calling handleSort
+              handleSort(prevTasks, newSortMethod);
+              return prevTasks;
+            });
             return newSortMethod;
           });
         }}
