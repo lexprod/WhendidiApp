@@ -5,23 +5,28 @@ import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 const Task = (props) => {
     return (
-        <View style={styles.taskContainer}>
-            <Text style={styles.taskText}>{props.text}</Text>
-            {/* //if edit mode on render trash button */}
-            {(props.editMode) ? (
-                <Pressable
-                    style={styles.trashBox}
-                    onPress={() => props.handleDeleteOne({ item: props.task })}
-                >
-                    <FontAwesome name="trash" size={28} color={'red'} />
-                </Pressable>
-            ) : null
-            }
-            <View style={styles.timeBox}>
-                <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
-                <Text style={styles.timeTextLabel}>days ago</Text>
-            </View>
-        </View >
+        <Pressable onLongPress={() => { props.handleMarkedDone({ item: props.task }) }}>
+            <View style={styles.taskContainer}>
+
+                <Text style={styles.taskText}>{props.text}</Text>
+                {/* //if edit mode on render trash button */}
+                {(props.editMode) ? (
+                    <Pressable
+                        style={styles.trashBox}
+                        onPress={() => props.handleDeleteOne({ item: props.task })}
+                    >
+                        <FontAwesome name="trash" size={28} color={'red'} />
+                    </Pressable>
+                ) : null
+                }
+                <View style={styles.timeBox}>
+                    <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
+                    <Text style={styles.timeTextLabel}>days ago</Text>
+                </View>
+
+
+            </View >
+        </Pressable>
     );
 };
 
