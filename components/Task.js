@@ -1,12 +1,42 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import React from 'react';
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
+import React, { useEffect, useRef } from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 
+let ACTION_TIMER = 500;
+let COLORS = ['#FFF', '#34D156'];
+
+
 const Task = (props) => {
+    const animProgress = useRef(new Animated.Value(0)).current;
+
+    const handlePressIn = () => {
+        Animated.timing(animProgress, {
+            toValue: 1,
+            duration: ACTION_TIMER,
+            useNativeDriver: true,
+        }).start(this.animationActionComplete);
+    }
+    const handlePressOut = () => {
+        Animated.timing(animProgress, {
+            toValue: 0,
+            duration: this._value * ACTION_TIMER,
+            useNativeDriver: true,
+        }).start();
+    }
+
     return (
-        <Pressable onLongPress={() => { props.handleMarkedDone({ item: props.task }) }}>
-            <View style={styles.taskContainer}>
+        <Pressable
+            onLongPress={() => { props.handleMarkedDone({ item: props.task }) }}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+        >
+            <Animated.View style={{
+                ...styles.taskContainer, backgroundColor: animProgress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: COLORS
+                })
+            }}>
 
                 <Text style={styles.taskText}>{props.text}</Text>
                 {/* //if edit mode on render trash button */}
@@ -23,9 +53,7 @@ const Task = (props) => {
                     <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
                     <Text style={styles.timeTextLabel}>days ago</Text>
                 </View>
-
-
-            </View >
+            </Animated.View>
         </Pressable>
     );
 };

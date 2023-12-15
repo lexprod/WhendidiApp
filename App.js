@@ -137,8 +137,6 @@ export default function App() {
     if (sortMethod == 1) {
       sortedTasks.sort((a, b) => b.whenDid - a.whenDid)
     }
-    console.log(sortedTasks);
-
     AsyncStorage.setItem('storedTasks', JSON.stringify(sortedTasks)).then(() => {
       setTasks(sortedTasks);
     }).catch(error => console.log(error));
