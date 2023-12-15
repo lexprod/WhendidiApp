@@ -10,6 +10,6 @@ Then it is added to the list and will update as time passes to tell you how many
 
 Once you do the task again, in your app just long-press that task to update it to 0 days ago.
 
-Currently the only way to delete tasks is to clear the whole list, individual task deletion/editing on the way.
+Turning on edit mode allows for deletion of individual tasks.
 
 App utilizes AsyncStorage to store data locally on the device.

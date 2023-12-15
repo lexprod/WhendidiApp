@@ -37,6 +37,7 @@ const Task = (props) => {
                     outputRange: COLORS
                 })
             }}>
+
                 <Text style={styles.taskText}>{props.text}</Text>
                 {/* //if edit mode on render trash button */}
                 {(props.editMode) ? (
@@ -52,8 +53,6 @@ const Task = (props) => {
                     <Text style={styles.timeTextNumber}>{props.timeNum}</Text>
                     <Text style={styles.timeTextLabel}>days ago</Text>
                 </View>
-
-
             </Animated.View>
         </Pressable>
     );
