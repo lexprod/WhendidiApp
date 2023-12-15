@@ -147,9 +147,8 @@ export default function App() {
       <View>
         <Pressable
           activeOpacity={0}
-          underlayColor={'#FFF'}
-          onLongPress={() => { handleMarkedDone({ item: task }) }}>
-          <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} task={task} />
+          underlayColor={'#FFF'}>
+          <Task text={task.text} timeNum={timeNum} editMode={editMode} handleDeleteOne={handleDeleteOne} handleMarkedDone={handleMarkedDone} task={task} />
         </Pressable>
       </View>
 
@@ -169,19 +168,8 @@ export default function App() {
     if (sortMethod == 1) {
       newTasks.sort((a, b) => b.whenDid - a.whenDid)
     }
-    // if (sortMethod == 2) {
-    //   newTasks.sort((a, b) => {
-    //     if (a.text < b.text) {
-    //       return -1;
-    //     }
-    //     if (a.text > b.text) {
-    //       return 1;
-    //     }
-    //     return 0;
-    //   })
-    // }
-    console.log(sortMethod);
-    console.log(newTasks);
+    // console.log(sortMethod);
+    // console.log(newTasks);
     AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
       setTasks(newTasks);
     }).catch(error => console.log(error));
