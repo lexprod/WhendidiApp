@@ -16,4 +16,4 @@ App utilizes AsyncStorage to store data locally on the device.
 
 Below is a GIF demonstrating its features
 
-![](https://github.com/whendidiapp/whendiddemo2.gif)
+![](https://github.com/lexprod/whendidiapp/blob/main/whendiddemo2.gif)
