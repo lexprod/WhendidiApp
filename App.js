@@ -197,12 +197,17 @@ export default function App() {
       onLayout={onLayoutRootView}
       style={styles.container}>
       <Text style={styles.titleText}>When did I...?</Text>
+
+
+      {/* task list */}
       <FlatList style={{ width: '100%' }}
         data={tasks}
         renderItem={RenderTask}
         keyExtractor={(item) => item.id.toString()}
       >
       </FlatList>
+
+      {/* new task modal   */}
       <View>
         <Modal
           animationType='slide'
@@ -269,6 +274,9 @@ export default function App() {
 
         </Modal>
       </View>
+
+
+      {/* main view buttons */}
       <View
         style={styles.mainButtonRow}
       >
