@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 
-let ACTION_TIMER = 500;
+let ACTION_TIMER = 2500;
 let COLORS = ['#FFF', '#34D156'];
 
 
@@ -27,6 +27,7 @@ const Task = (props) => {
 
     return (
         <Pressable
+            delayLongPress={ACTION_TIMER}
             onLongPress={() => { props.handleMarkedDone({ item: props.task }) }}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
