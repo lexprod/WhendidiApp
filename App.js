@@ -1,13 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, TouchableHighlight } from 'react-native';
+import { Pressable, StyleSheet, Text, View, FlatList, TextInput, Modal, NativeModules, LayoutAnimation } from 'react-native';
 import Task from './components/Task';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import React from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 //async
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import { v4 as uuidv4 } from 'uuid';
+
+//needed for android layout animation
+const { UIManager } = NativeModules;
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 
 SplashScreen.preventAutoHideAsync();
@@ -48,6 +55,15 @@ export default function App() {
 
   const [taskInputDays, setTaskInputDays] = useState(0);
 
+  //layout anim
+  const layoutAnimRef = useRef(null);
+
+  useEffect(() => {
+    layoutAnimRef.current = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    };
+  }, []);
+
 
 
   const handleOpenModal = () => {
@@ -87,12 +103,12 @@ export default function App() {
     setTaskInputDays(0);
   }
 
-  const handleResetTasks = () => {
-    const newTasks = [];
-    AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
-      setTasks(newTasks);
-    }).catch(error => console.log(error));
-  }
+  // const handleResetTasks = () => {
+  //   const newTasks = [];
+  //   AsyncStorage.setItem('storedTasks', JSON.stringify(newTasks)).then(() => {
+  //     setTasks(newTasks);
+  //   }).catch(error => console.log(error));
+  // }
 
 
   const handleDeleteOne = ({ item: task }) => {
@@ -129,6 +145,7 @@ export default function App() {
   const [sortMethod, setSortMethod] = useState(0);
   ///0 is alphabetical, 1 is most days overdue, 2 is least days overdue
   const handleSort = (tsks) => {
+
     const sortedTasks = [...tsks];
     console.log(sortMethod);
     if (sortMethod == 0) {
@@ -139,11 +156,14 @@ export default function App() {
     }
     AsyncStorage.setItem('storedTasks', JSON.stringify(sortedTasks)).then(() => {
       setTasks(sortedTasks);
+      layoutAnimRef.current();
     }).catch(error => console.log(error));
   }
 
 
   const handleMarkedDone = ({ item: task }) => {
+    layoutAnimRef.current();
+
     //locate task to mark done
     const taskIndex = tasks.findIndex((t) => t.id === task.id);
 

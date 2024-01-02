@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { AntDesign, FontAwesome } from '@expo/vector-icons';
 
 
-let ACTION_TIMER = 2500;
+let ACTION_TIMER = 1500;
 let COLORS = ['#FFF', '#34D156'];
 
 
